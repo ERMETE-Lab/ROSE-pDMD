@@ -3,10 +3,23 @@ from matplotlib import cm
 import matplotlib.patches as patches
 import numpy as np
 import pandas as pd
-
-from sympy import frac
+import imageio.v2 as imageio
+import os
 
 from .backends import get_mag_fenicsx
+
+def make_mp4(path, video_path, fps=30, key = lambda x: int(x.split('_')[1].split('.')[0])):
+    # Sort image files numerically based on the extracted time value
+    image_files = [img for img in os.listdir(path) if img.endswith('.png')]
+    image_files = sorted(image_files, key = key)
+
+    # Create the MP4 video by loading each image and adding it to the array
+    with imageio.get_writer(video_path, fps=fps, codec="libx264") as writer:
+        for img_file in image_files:
+            img_path = os.path.join(path, img_file)
+            image = imageio.imread(img_path)
+            writer.append_data(image)
+
 
 class PlotDYNASTY():
     def __init__(self, domain):
@@ -107,7 +120,7 @@ class PlotDYNASTY():
                             recons: list, labels: list, cmap=cm.RdYlBu_r, 
                             length_plot = 6, levels=None, fontsize=20, 
                             shrink=0.9, fraction=0.046, pad=0.04,
-                            show_residuals = True
+                            show_residuals = True, show_cb = True
                                 ):
 
         if show_residuals:
@@ -134,10 +147,10 @@ class PlotDYNASTY():
                     resid = np.abs(fom[mu_i, tt] - recon[:, tt])
                     resid_loop = self.plot_loop(axs[1 + len(recons) + j, i], resid, cmap=cmap, vmin=resid.min(), vmax=resid.max())
 
-            if show_residuals:
+            if show_residuals and show_cb:
                 fig.colorbar(resid_loop, ax=axs[len(recons)+1:, i], shrink=shrink, fraction=fraction, pad = pad).set_label('Residual')
-
-        fig.colorbar(fom_loop, ax=axs[:len(recons)+1, -1], shrink=shrink, fraction=fraction, pad = pad).set_label('Temperature')
+        if show_cb:
+            fig.colorbar(fom_loop, ax=axs[:len(recons)+1, -1], shrink=shrink, fraction=fraction, pad = pad).set_label('Temperature')
         [axs[0, i].set_title('P = {:.2f}'.format(params[params_to_plot[i]]), fontsize=fontsize) for i, mu_i in enumerate(params_to_plot)]
 
         axs[0,0].set_ylabel('FOM', fontsize=fontsize-5)

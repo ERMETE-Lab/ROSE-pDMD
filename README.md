@@ -24,3 +24,10 @@ The code is written in Python and uses the following libraries:
 - `scikit-learn`
 - `pydmd` [https://github.com/PyDMD/PyDMD](https://github.com/PyDMD/PyDMD)
 - `imageio.v2`
+
+
+----------------
+
+### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano
+
+![dynasty1param](./TestCases/SupportingVideos/dynasty1param_video.mp4)
