@@ -2,8 +2,157 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import matplotlib.patches as patches
 import numpy as np
+import pandas as pd
+
+from sympy import frac
 
 from .backends import get_mag_fenicsx
+
+class PlotDYNASTY():
+    def __init__(self, domain):
+        self.domain = domain
+
+        # Define DYNASTY coordinates
+        data = {
+            "CV_code": self.domain[:, 0],  # Example CV codes
+            "Component": [
+                *["GV1"]*2, *["Cooler"]*(26-5), *["GV2"]*(61-26), *["GO1"]*(92-61), *["GV1"]*(125-92)
+            ]
+        }
+        df = pd.DataFrame(data)
+
+        # Loop dimensions
+        loop_dimension = 3.05
+        half_dim = loop_dimension / 2
+
+        # Segment lengths based on the number of control volumes
+        num_gv1 = sum(df['Component'] == 'GV1')
+        num_cooler = sum(df['Component'] == 'Cooler')
+        num_gv2 = sum(df['Component'] == 'GV2')
+        num_go1 = sum(df['Component'] == 'GO1')
+
+        # Calculate x, y coordinates for each segment
+        coords = []
+
+        # GV1 (left leg) goes from bottom (-half_dim, -half_dim) to top (-half_dim, +half_dim)
+        y_gv1 = np.linspace(-half_dim, half_dim, num_gv1)
+        x_gv1 = np.full(num_gv1, -half_dim)
+        coords.extend(zip(x_gv1, y_gv1))
+
+        # Cooler (top leg) goes from left (-half_dim, +half_dim) to right (+half_dim, +half_dim)
+        x_cooler = np.linspace(-half_dim, half_dim, num_cooler)
+        y_cooler = np.full(num_cooler, half_dim)
+        coords.extend(zip(x_cooler, y_cooler))
+
+        # GV2 (right leg) goes from top (+half_dim, +half_dim) to bottom (+half_dim, -half_dim)
+        y_gv2 = np.linspace(half_dim, -half_dim, num_gv2)
+        x_gv2 = np.full(num_gv2, half_dim)
+        coords.extend(zip(x_gv2, y_gv2))
+
+        # GO1 (bottom leg) goes from right (+half_dim, -half_dim) to left (-half_dim, -half_dim)
+        x_go1 = np.linspace(half_dim, -half_dim, num_go1)
+        y_go1 = np.full(num_go1, -half_dim)
+        coords.extend(zip(x_go1, y_go1))
+
+        # Rearrange the coordinates to start from the second-to-last point of GV1
+        coords = coords[(125-92):] + coords[:(125-92)]  # Move last two points of GV1 to the start
+
+        # Assign coordinates to DataFrame
+        df['x'], df['y'] = zip(*coords)
+
+        self.coords = np.asarray(df['x'].to_numpy()), np.asarray(df['y'].to_numpy())
+
+    def plot_contour(self, ax, snap, time = None, cmap = cm.jet, levels=40, show_ticks=False):
+        if time is None:
+            time = np.arange(0, snap.shape[1], 1)
+        
+        assert snap.shape[0] == self.domain.shape[0], 'Snapshots and domain do not have the same number of nodes'
+        assert snap.shape[1] == len(time), 'Snapshots and time do not have the same number of time steps'
+
+        plot = ax.contourf(time, self.domain[:, 0], snap, cmap=cmap, levels=levels)
+
+        if not show_ticks:
+            ax.set_xticks([])
+            ax.set_yticks([])
+        return plot
+    
+    def  add_tubes(ax, _s, facecolors = ['none']*2):
+        outer_rect = patches.Rectangle((-3.05/2 - _s, -3.05/2 - _s), 3.05 + 2 * _s, 3.05 + 2 * _s, linewidth=1, edgecolor='k', facecolor=facecolors[0])
+        inner_rect = patches.Rectangle((-3.05/2 + _s, -3.05/2 + _s), 3.05 - 2 * _s, 3.05 - 2 * _s, linewidth=1, edgecolor='k', facecolor=facecolors[1])
+        
+        ax.add_patch(outer_rect)
+        ax.add_patch(inner_rect)
+
+    def plot_loop(self, ax, snap, cmap=cm.jet, s=100,
+                  _s_coeff = None, show_ticks=False, vmin=None, vmax=None):
+
+        # Create and add the rectangles
+        if _s_coeff is not None:
+            _s = s / _s_coeff
+            self.add_tubes(ax, _s)
+        
+        # Plot the loop
+        sc = ax.scatter(*self.coords, c=snap, cmap=cmap, s=s, marker='s', vmin=vmin, vmax=vmax)
+
+        if not show_ticks:
+            ax.set_xticks([])
+            ax.set_yticks([])
+
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        return sc 
+    
+    def plotting_loop_rec(  self, params_to_plot, fom, params, fom_times, tt,
+                            recons: list, labels: list, cmap=cm.RdYlBu_r, 
+                            length_plot = 6, levels=None, fontsize=20, 
+                            shrink=0.9, fraction=0.046, pad=0.04,
+                            show_residuals = True
+                                ):
+
+        if show_residuals:
+            nrows = 1 + len(recons) * 2
+        else:
+            nrows = 1 + len(recons)
+        ncols = len(params_to_plot)
+
+        fig, axs = plt.subplots(nrows, ncols, figsize=(length_plot * ncols, nrows * (length_plot-0.5)))
+        axs = axs.reshape(nrows, ncols)
+
+        if levels is None:
+            levels = [np.min(fom), np.max(fom)]
+
+        for i, mu_i in enumerate(params_to_plot):
+
+            fom_loop = self.plot_loop(axs[0, i], fom[mu_i, tt], cmap=cmap, vmin=levels[0], vmax=levels[1])
+
+            for j, recon in enumerate(recons):
+                recon = recon[i]
+                self.plot_loop(axs[1 + j, i], recon[:, tt], cmap=cmap, vmin=levels[0], vmax=levels[1])
+
+                if show_residuals:
+                    resid = np.abs(fom[mu_i, tt] - recon[:, tt])
+                    resid_loop = self.plot_loop(axs[1 + len(recons) + j, i], resid, cmap=cmap, vmin=resid.min(), vmax=resid.max())
+
+            if show_residuals:
+                fig.colorbar(resid_loop, ax=axs[len(recons)+1:, i], shrink=shrink, fraction=fraction, pad = pad).set_label('Residual')
+
+        fig.colorbar(fom_loop, ax=axs[:len(recons)+1, -1], shrink=shrink, fraction=fraction, pad = pad).set_label('Temperature')
+        [axs[0, i].set_title('P = {:.2f}'.format(params[params_to_plot[i]]), fontsize=fontsize) for i, mu_i in enumerate(params_to_plot)]
+
+        axs[0,0].set_ylabel('FOM', fontsize=fontsize-5)
+        for j, recon in enumerate(recons):
+            axs[1 + j, 0].set_ylabel(labels[j], fontsize=fontsize-5)
+            if show_residuals:
+                axs[1 + len(recons) + j, 0].set_ylabel('Residual - ' + labels[j], fontsize=fontsize-5)
+
+        fig.suptitle('Time = {:.2f} s'.format(fom_times[tt]), y=.98, fontsize=fontsize+2)
+
+        for ax in axs.flatten():
+            ax.set_aspect('equal')
+
+        return fig, axs
+
 
 class PlotFlowCyl_Fenicsx():
     def __init__(self, domain):

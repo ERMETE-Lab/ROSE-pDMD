@@ -24,9 +24,9 @@ def dmd_reconstruct(dmd_model, pod_modes, scaler = None, time=None):
         dmd_reconstructed = dmd_model.reconstructed_data.T.real
 
     if scaler is not None:
-        dmd_reconstructed = scaler.inverse_transform(dmd_reconstructed).T
+        dmd_reconstructed = scaler.inverse_transform(dmd_reconstructed)
 
-    return np.dot(pod_modes, dmd_reconstructed)
+    return np.dot(pod_modes, dmd_reconstructed.T)
 
 def flatten_operator(A):
     _A = np.zeros((A.shape[0], A.shape[1]*A.shape[2]))
@@ -65,7 +65,7 @@ class ReducedOperatorInterpolation():
 
             _pod_coeff = scaler.transform(_flatten_coeff).reshape(_pod_coeff.shape)
         else:
-            scaler = None
+            self.scaler = None
 
         self.dmds = dict()
         self.train_pod_coeff = _pod_coeff
@@ -173,7 +173,7 @@ class ReducedKoopmanOperatorInterpolation():
 
             _pod_coeff = scaler.transform(_flatten_coeff).reshape(_pod_coeff.shape)
         else:
-            scaler = None
+            self.scaler = None
 
         self.dmds = dict()
         self.train_pod_coeff = _pod_coeff
