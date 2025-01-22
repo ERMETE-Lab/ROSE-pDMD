@@ -2,6 +2,7 @@
 *.npz
 TestCases/Results
 data/
+*.mp4
 
 # Mac
 .DS_Store

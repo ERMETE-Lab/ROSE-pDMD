@@ -20,6 +20,20 @@ def make_mp4(path, video_path, fps=30, key = lambda x: int(x.split('_')[1].split
             image = imageio.imread(img_path)
             writer.append_data(image)
 
+def make_gif(path, gif_path, fps=30, key=lambda x: int(x.split('_')[1].split('.')[0])):
+    # Sort image files numerically based on the extracted time value
+    image_files = [img for img in os.listdir(path) if img.endswith('.png')]
+    image_files = sorted(image_files, key=key)
+
+    # Create the GIF by loading each image and appending it to the gif writer
+    images = []
+    for img_file in image_files:
+        img_path = os.path.join(path, img_file)
+        image = imageio.imread(img_path)
+        images.append(image)
+
+    # Save the images as a GIF
+    imageio.mimsave(gif_path, images, fps=fps)
 
 class PlotDYNASTY():
     def __init__(self, domain):

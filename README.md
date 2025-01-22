@@ -30,4 +30,4 @@ The code is written in Python and uses the following libraries:
 
 ### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano
 
-![dynasty1param](./TestCases/SupportingVideos/dynasty1param_video.mp4)
+![dynasty1param](./TestCases/SupportingVideos/dynasty1param_video.gif)
