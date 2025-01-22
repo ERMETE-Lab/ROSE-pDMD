@@ -1,7 +1,7 @@
 # Snapshots
 *.npz
-figures/
-data/
+TestCases/Results
+data/*.npz
 
 # Mac
 .DS_Store
