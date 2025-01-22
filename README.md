@@ -31,5 +31,5 @@ The code is written in Python and uses the following libraries:
 ### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano
 
 <div style="text-align: center;">
-<img src="./TestCases/SupportingVideos/dynasty1param_video.gif" alt="Process Animation" height="600">
+  <img src="./TestCases/SupportingVideos/dynasty1param_video.gif" alt="Process Animation" height="600">
 </div>
