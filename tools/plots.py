@@ -6,7 +6,7 @@ import pandas as pd
 import imageio.v2 as imageio
 import os
 
-from .backends import get_mag_fenicsx
+from .backends import get_mag_fenicsx, get_mag
 
 def make_mp4(path, video_path, fps=30, key = lambda x: int(x.split('_')[1].split('.')[0])):
     # Sort image files numerically based on the extracted time value
@@ -181,8 +181,8 @@ class PlotDYNASTY():
         return fig, axs
 
 
-class PlotFlowCyl_Fenicsx():
-    def __init__(self, domain):
+class PlotFlowCyl():
+    def __init__(self, domain, centre = (0.5, 0.5), radius = 0.05, is_fenicsx = True):
         self.domain = domain
 
         width = np.max(domain[:,0]) - np.min(domain[:,0])
@@ -190,15 +190,23 @@ class PlotFlowCyl_Fenicsx():
 
         self.aspect = height / width
 
+        self.centre = centre
+        self.radius = radius
+        self.is_fenicsx = is_fenicsx
+
     def create_circle(self, ls=1):
-        # Add a circle centered at (0.5, 0.5) with radius 0.05
-        circle = patches.Circle((0.5, 0.5), 0.05, edgecolor='black', facecolor='white', linewidth=ls)
+        
+        circle = patches.Circle(self.centre, self.radius, edgecolor='black', facecolor='white', linewidth=ls)
         return circle
     
     def plot_contour(self, ax, snap, cmap = cm.RdYlBu_r, levels=40, show_ticks=False):
 
         if snap.shape[0] == 2*self.domain.shape[0]:
-            snap = get_mag_fenicsx(snap)
+
+            if self.is_fenicsx:
+                snap = get_mag_fenicsx(snap)
+            else:
+                snap = get_mag(snap)
 
         plot = ax.tricontourf(self.domain[:,0], self.domain[:,1], snap, cmap=cmap, levels=levels)
         ax.add_patch(self.create_circle())
@@ -232,7 +240,11 @@ class PlotFlowCyl_Fenicsx():
                 self.plot_contour(axs[1 + j, i], recon[:, tt], cmap=cmap, levels=levels)
 
                 if show_residuals:
-                    resid = np.abs(get_mag_fenicsx(fom[mu_i, tt]) - get_mag_fenicsx(recon[:, tt])) 
+                    if self.is_fenicsx:
+                        resid = np.abs(get_mag_fenicsx(fom[mu_i, tt]) - get_mag_fenicsx(recon[:, tt])) 
+                    else:
+                        resid = np.abs(get_mag(fom[mu_i, tt]) - get_mag(recon[:, tt]))
+
                     self.plot_contour(axs[1 + len(recons) + j, i], resid, cmap=cmap, levels=levels)
 
         fig.colorbar(fom_cont, ax=axs[:, -1], shrink=shrink).set_label('Velocity')

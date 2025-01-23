@@ -16,6 +16,19 @@ def get_mag_fenicsx(u_vec):
     v = u_vec[1::2]
     return np.sqrt(u**2 + v**2)
 
+
+def get_mag(u_vec):
+    """
+    Function to get the magnitude of a vector field in FEniCSx format (data are assumed 2D).
+    """
+
+    Nh = int(u_vec.shape[0]/2)
+
+    u = u_vec[:Nh]
+    v = u_vec[Nh:]
+    return np.sqrt(u**2 + v**2)
+
+
 def dmd_reconstruct(dmd_model, pod_modes, scaler = None, time=None):
     
     if time is not None:
