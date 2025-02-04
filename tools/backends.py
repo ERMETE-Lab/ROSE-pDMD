@@ -159,9 +159,9 @@ class ReducedOperatorInterpolation():
             x[i] = np.dot(operator, x[i-1])
 
         if self.scaler is not None:
-            x = self.scaler.inverse_transform(x).T
+            x = self.scaler.inverse_transform(x)
 
-        return x.T
+        return x
 
 class ReducedKoopmanOperatorInterpolation():
     
@@ -169,7 +169,8 @@ class ReducedKoopmanOperatorInterpolation():
         self.rank = rank
 
     def fit(self, pod_coeff: np.ndarray, train_time: np.ndarray,
-            scaler = None, verbose = False, tol = 0.2, opt_verbose = False):
+            scaler = None, verbose = False, tol = 0.2, opt_verbose = False,
+            **kwargs):
         """
         Fit the POD coefficients with standard DMD algorithm. 
         The input data are assumed to be in the format (n_params, n_times, rank).
@@ -200,6 +201,7 @@ class ReducedKoopmanOperatorInterpolation():
                                         num_trials=0,                                    # Number of bagging trials to perform - 0 means no bagging.
                                         varpro_opts_dict={"tol": tol, "verbose": opt_verbose}, # Set convergence tolerance and use verbose updates.
                                         compute_A = True,
+                                        **kwargs
                                     )
 
             self.dmds[mu_i].fit(_pod_coeff[mu_i].T, train_time)
@@ -223,9 +225,9 @@ class ReducedKoopmanOperatorInterpolation():
     def get_kop(self):
 
         self.train_kop =    {
-                                'amplitudes': np.asarray([self.dmds[mu_i].amplitudes      for mu_i in range(self.train_pod_coeff.shape[0])], dtype=np.float64),
+                                'amplitudes': np.asarray([self.dmds[mu_i].amplitudes      for mu_i in range(self.train_pod_coeff.shape[0])], dtype=np.complex64),
                                 'eigs':       np.asarray([self.dmds[mu_i].eigs            for mu_i in range(self.train_pod_coeff.shape[0])], dtype=np.complex64),
-                                'modes':      np.asarray([self.dmds[mu_i].modes.flatten() for mu_i in range(self.train_pod_coeff.shape[0])], dtype=np.float64)
+                                'modes':      np.asarray([self.dmds[mu_i].modes.flatten() for mu_i in range(self.train_pod_coeff.shape[0])], dtype=np.complex64)
                             }
 
     def get_kop_interpolants(self, train_params, interp = 'CubicSpline'):
