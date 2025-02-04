@@ -28,15 +28,22 @@ The code is written in Python and uses the following libraries:
 
 ----------------
 
-### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano
+### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano -->
 
 <p align="center" width="100%">
-  <img width=60% src="./TestCases/SupportingVideos/dynasty1param_video.gif" >
+  <img width=60% src="./TestCases/SupportingImages/dynasty1param.png" >
   <br />
 </p>
 
-### Flow over cylinde with dolfinx-v6
+### Flow over cylinder - dolfinx-v6
 
 <p align="center" width="100%">
-  <img width=100% src="./TestCases/SupportingVideos/flowCylFenics.gif" >
+  <img width=100% src="./TestCases/SupportingImages/flowCylCFDdolfinx.png" >
   <br />
+
+### Flow over cylinder - CFDbench
+
+<p align="center" width="100%">
+  <img width=100% src="./TestCases/SupportingImages/flowCylCFDBench.png" >
+  <br />
+ -->
