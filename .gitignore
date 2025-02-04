@@ -3,6 +3,7 @@
 TestCases/Results
 data/
 *.mp4
+*.gif
 
 # Mac
 .DS_Store
