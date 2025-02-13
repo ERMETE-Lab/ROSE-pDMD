@@ -124,15 +124,15 @@ class ReducedOperatorInterpolation():
 
         self.operator_svd = randomized_svd(Aop_flattened, n_components=self.rank_op_svd, n_iter='auto')
 
-    def get_op_interpolants(self, train_params, interp = 'Cubic'):
+    def get_op_interpolants(self, train_params, interp = 'linear'):
 
         self.interpolants_op = dict()
 
         for jj in range(self.rank_op_svd):
-            if interp == 'LinInt':
-                self.interpolants_op[jj] = interp1d(train_params, self.operator_svd[2][jj], kind='linear')
+            if interp == 'linear' or interp == 'cubic':
+                self.interpolants_op[jj] = interp1d(train_params, self.operator_svd[2][jj], kind=interp)
             else:
-                self.interpolants_op[jj] = interp1d(train_params, self.operator_svd[2][jj], kind='cubic')
+                raise ValueError('Interpolation method not recognized.')
 
     def predict_op(self, param):
 
