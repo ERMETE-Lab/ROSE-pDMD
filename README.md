@@ -41,7 +41,7 @@ The code is written in Python and uses the following libraries:
   <br />
  -->
 
-### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano -->
+### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano
 
 <p align="center" width="100%">
   <img width=60% src="./TestCases/SupportingImages/dynasty1param.png" >
