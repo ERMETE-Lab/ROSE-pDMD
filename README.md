@@ -8,9 +8,9 @@ Mode Decomposition Methods for Nuclear Reactors Applications,” 2025**
 
 The following test cases are provided:
 
-1. a laminar flow over cylinder (Reynolds between 100 and 150) generated with [dolfinx-v6](https://github.com/FEniCS/dolfinx) using [OFELIA solvers](https://github.com/ERMETE-Lab/MP-OFELIA)
-2. flow over cylinder from CFDbench
-3. RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano (see [Riva et al. (2024) - NUTHOS14 Conference](https://www.researchgate.net/publication/384146697_A_Novel_Approach_for_Parametric_Dynamic_Mode_Decomposition_application_to_the_DYNASTY_Experimental_Facility))
+1. Laminar flow over cylinder (Reynolds between 100 and 150) generated with [dolfinx-v6](https://github.com/FEniCS/dolfinx) using [OFELIA solvers](https://github.com/ERMETE-Lab/MP-OFELIA)
+2. Flow over cylinder from CFDbench benchmark for Machine Learning
+3. RELAP5 model of DYNASTY, a natural circulation loop deployed at Politecnico di Milano (see [Riva et al. (2024) - NUTHOS14 Conference](https://www.researchgate.net/publication/384146697_A_Novel_Approach_for_Parametric_Dynamic_Mode_Decomposition_application_to_the_DYNASTY_Experimental_Facility))
 
 ---
 
@@ -19,11 +19,12 @@ The code is written in Python and uses the following libraries:
 - `numpy`
 - `scipy`
 - `matplotlib`
+- `pandas`
 - `tqdm`
 - `scikit-learn`
+- `ezyrb`
 - `pydmd` [https://github.com/PyDMD/PyDMD](https://github.com/PyDMD/PyDMD)
 - `imageio.v2`
-
 
 ----------------
 
