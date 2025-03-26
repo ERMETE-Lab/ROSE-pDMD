@@ -2,8 +2,8 @@
 *.npz
 TestCases/Results
 data/
-*.mp4
-*.gif
+TestCases/SupportingVideos/*.mp4
+# TestCases/SupportingVideos/*.gif
 
 # Mac
 .DS_Store
