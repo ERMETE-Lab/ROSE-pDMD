@@ -30,26 +30,28 @@ The code is written in Python and uses the following libraries:
 
 ### Flow over cylinder - dolfinx-v6
 
+
+<img src="./TestCases/SupportingVideos/flowCylFenics.gif" width="500">
+
+<!--
 <p align="center" width="100%">
   <img width=100% src="./TestCases/SupportingImages/flowCylCFDdolfinx.png" >
-  <br />
+  <br /> -->
 
 ### Flow over cylinder - CFDbench
 
-<p align="center" width="100%">
+<img src="./TestCases/SupportingVideos/flowCylCFDBench.gif" width="500">
+
+<!-- <p align="center" width="100%">
   <img width=100% src="./TestCases/SupportingImages/flowCylCFDBench.png" >
   <br />
  -->
 
 ### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano
 
-<p align="center" width="100%">
-  <img width=60% src="./TestCases/SupportingImages/dynasty1param.png" >
-  <br />
-</p>
+<img src="./TestCases/SupportingVideos/dynasty1param_video.gif" width="500">
 
-<!-- GIF
-<p align="center" width="100%">
-  <img width=80% src="./media/SWE.gif" >
+<!-- <p align="center" width="100%">
+  <img width=60% src="./TestCases/SupportingImages/dynasty1param.png" >
   <br />
 </p> -->

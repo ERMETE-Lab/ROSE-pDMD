@@ -112,7 +112,7 @@ class PlotDYNASTY():
         ax.add_patch(inner_rect)
 
     def plot_loop(self, ax, snap, cmap=cm.jet, s=100,
-                  _s_coeff = None, show_ticks=False, vmin=None, vmax=None):
+                  _s_coeff = None, show_ticks=False, vmin=None, vmax=None, width_rec = 0.1):
 
         # Create and add the rectangles
         if _s_coeff is not None:
@@ -128,6 +128,15 @@ class PlotDYNASTY():
 
         for spine in ax.spines.values():
             spine.set_visible(False)
+
+        # Add black rectangles
+        width  = self.coords[0].max() - self.coords[0].min()
+        height = self.coords[1].max() - self.coords[1].min()
+
+        rec1 = patches.Rectangle((self.coords[0].min()+width_rec, self.coords[1].min()+width_rec), width - width_rec*2, height - width_rec*2, linewidth=1, edgecolor='k', facecolor='none')
+        rec2 = patches.Rectangle((self.coords[0].min()-width_rec, self.coords[1].min()-width_rec), width + width_rec*2, height + width_rec*2, linewidth=1, edgecolor='k', facecolor='none')
+        ax.add_patch(rec1)
+        ax.add_patch(rec2)
 
         return sc 
     
