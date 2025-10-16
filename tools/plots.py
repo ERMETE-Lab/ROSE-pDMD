@@ -189,6 +189,65 @@ class PlotDYNASTY():
             ax.set_aspect('equal')
 
         return fig, axs
+    
+    def plotting_loop_rec_residual(  self, params_to_plot, fom, params, fom_times, tt,
+                            recons: list, labels: list, cmap=cm.RdYlBu_r, 
+                            length_plot = 6, levels=None, fontsize=20, 
+                            shrink=0.9, fraction=0.046, pad=0.04,
+                            show_cb = True, show_res_cb = True
+                                ):
+
+        nrows = 1 + len(recons)
+        ncols = len(params_to_plot)*2
+
+        fig, axs = plt.subplots(nrows, ncols, figsize=(length_plot * ncols, nrows * (length_plot-0.5)))
+        axs = axs.reshape(nrows, ncols)
+
+        if levels is None:
+            levels = [np.min(fom), np.max(fom)]
+
+        for i, mu_i in enumerate(params_to_plot):
+
+            fom_loop = self.plot_loop(axs[0, i*2], fom[mu_i, tt], cmap=cmap, vmin=levels[0], vmax=levels[1])
+
+            # preliminary assessment of levels for residuals
+            _max_res = 0
+            for j, recon in enumerate(recons):
+                recon = recon[i]
+                resid = np.abs(fom[mu_i, tt] - recon[:, tt])
+                _max_res = max(_max_res, resid.max())
+            res_levels = [0, _max_res]
+
+            for j, recon in enumerate(recons):
+                recon = recon[i]
+                self.plot_loop(axs[1 + j, i*2], recon[:, tt], cmap=cmap, vmin=levels[0], vmax=levels[1])
+
+                resid = np.abs(fom[mu_i, tt] - recon[:, tt])
+                resid_loop = self.plot_loop(axs[1 + j, i*2+1], resid, cmap='viridis', vmin=res_levels[0], vmax=res_levels[1])
+
+            if show_res_cb:
+                cbar = fig.colorbar(resid_loop, ax=axs[0, i*2+1], orientation='horizontal', aspect = 10)
+                cbar.ax.set_xticks(np.linspace(res_levels[0], res_levels[1], 3))
+                cbar.ax.tick_params(labelsize=fontsize-4)
+
+        if show_cb:
+            fig.colorbar(fom_loop, ax=axs[:len(recons)+1, -1], shrink=shrink, fraction=fraction, pad = pad).set_label('Temperature')
+            
+        [axs[0, i*2].set_title('P = {:.2f}'.format(params[params_to_plot[i]]), fontsize=fontsize) for i, mu_i in enumerate(params_to_plot)]
+
+        axs[0,0].set_ylabel('FOM', fontsize=fontsize-5)
+        for j, recon in enumerate(recons):
+            axs[1 + j, 0].set_ylabel(labels[j], fontsize=fontsize-5)
+
+        fig.suptitle('Time = {:.2f} s'.format(fom_times[tt]), y=.98, fontsize=fontsize+2)
+
+        for ii in range(1, ncols, 2):
+            axs[0, ii].axis('off')
+
+        for ax in axs.flatten():
+            ax.set_aspect('equal')
+
+        return fig, axs
 
 
 class PlotFlowCyl():

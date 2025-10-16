@@ -50,7 +50,7 @@ The code is written in Python and uses the following libraries:
 
 ### RELAP5 model of DYNASTY, natural circulation loop at Politecnico di Milano
 
-<img src="./TestCases/SupportingVideos/dynasty1param_video.gif" width="500">
+<img src="./TestCases/SupportingVideos/dynasty1param.gif" width="500">
 
 <!-- <p align="center" width="100%">
   <img width=60% src="./TestCases/SupportingImages/dynasty1param.png" >
